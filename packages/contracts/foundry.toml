@@ -1,4 +1,9 @@
 [profile.default]
+fs_permissions = [
+    { access = "read", path = "./addresses" },
+    { access = "read", path = "./chainConfigs" },
+]
+
 src = "src"
 out = "out"
 libs = ["lib"]

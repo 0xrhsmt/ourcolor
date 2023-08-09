@@ -4,3 +4,6 @@
 [submodule "packages/contracts/lib/zora-1155-contracts"]
 	path = packages/contracts/lib/zora-1155-contracts
 	url = https://github.com/ourzora/zora-1155-contracts
+[submodule "packages/contracts/lib/openzeppelin-contracts"]
+	path = packages/contracts/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts

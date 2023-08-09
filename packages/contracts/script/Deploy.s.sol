@@ -6,9 +6,11 @@ import "forge-std/Script.sol";
 import {ScriptDeploymentConfig} from "@zoralabs/zora-1155-contracts/deployment/DeploymentConfig.sol";
 import {IZoraCreator1155Factory} from "@zoralabs/zora-1155-contracts/interfaces/IZoraCreator1155Factory.sol";
 import {ICreatorRoyaltiesControl} from "@zoralabs/zora-1155-contracts/interfaces/ICreatorRoyaltiesControl.sol";
+import {IMinter1155} from "@zoralabs/zora-1155-contracts/interfaces/IMinter1155.sol";
 import {ZoraCreator1155Impl} from "@zoralabs/zora-1155-contracts/nft/ZoraCreator1155Impl.sol";
 
 import {OurColor} from "../src/OurColor.sol";
+import {IOurColor} from "../src/interfaces/IOurColor.sol";
 import {OurColorRenderer} from "../src/OurColorRenderer.sol";
 
 contract DeployScript is ScriptDeploymentConfig {
@@ -71,6 +73,32 @@ contract DeployScript is ScriptDeploymentConfig {
         ourColor.setup(initOurColorData);
 
         console2.log("zora", zora);
+
+        // zora mint 2
+        bytes memory minterArguments = abi.encode(
+            address(deployer),
+            "test comment"
+        );
+        ZoraCreator1155Impl(zora).mint{value: 0.001554 ether}(
+            IMinter1155(saleStrategy),
+            1,
+            2,
+            minterArguments
+        );
+
+        ZoraCreator1155Impl(zora).setApprovalForAll(address(ourColor), true);
+
+        // generate new color
+        IOurColor.ColorUnit[] memory baseColors = new IOurColor.ColorUnit[](1);
+        baseColors[0] = IOurColor.ColorUnit({tokenId: 1, amount: 2});
+        ourColor.generateNewColor(baseColors);
+
+        ZoraCreator1155Impl(zora).mint{value: 0.001554 ether}(
+            IMinter1155(saleStrategy),
+            5,
+            2,
+            minterArguments
+        );
 
         vm.stopBroadcast();
     }

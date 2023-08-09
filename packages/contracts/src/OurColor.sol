@@ -110,6 +110,7 @@ contract OurColor is IOurColor {
         );
 
         colors[tokenId] = color;
+        colorToZoraTokenId[color] = tokenId;
 
         return tokenId;
     }

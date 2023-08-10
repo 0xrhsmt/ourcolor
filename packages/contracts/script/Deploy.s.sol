@@ -9,9 +9,9 @@ import {ICreatorRoyaltiesControl} from "@zoralabs/zora-1155-contracts/interfaces
 import {IMinter1155} from "@zoralabs/zora-1155-contracts/interfaces/IMinter1155.sol";
 import {ZoraCreator1155Impl} from "@zoralabs/zora-1155-contracts/nft/ZoraCreator1155Impl.sol";
 
-import {OurColor} from "../src/OurColor.sol";
-import {IOurColor} from "../src/interfaces/IOurColor.sol";
-import {OurColorRenderer} from "../src/OurColorRenderer.sol";
+import {OurColor} from "../contracts/OurColor.sol";
+import {IOurColor} from "../contracts/interfaces/IOurColor.sol";
+import {OurColorRenderer} from "../contracts/OurColorRenderer.sol";
 
 contract DeployScript is ScriptDeploymentConfig {
     function setUp() public {}

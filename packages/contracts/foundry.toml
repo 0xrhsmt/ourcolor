@@ -4,7 +4,7 @@ fs_permissions = [
     { access = "read", path = "./chainConfigs" },
 ]
 
-src = "src"
+src = "contracts"
 out = "out"
 libs = ["lib"]
 

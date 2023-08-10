@@ -1,3 +1,3 @@
-const RootPage = () => <div>Home</div>;
+const HomePage = () => <div>Home</div>;
 
-export default RootPage;
+export default HomePage;

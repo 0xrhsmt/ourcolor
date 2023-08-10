@@ -72,33 +72,32 @@ contract DeployScript is ScriptDeploymentConfig {
         );
         ourColor.setup(initOurColorData);
 
-        console2.log("zora", zora);
+        console2.log("ZoraCreator1155Impl", zora);
+        console2.log("OurColor", address(ourColor));
+        console2.log("OurColorRenderer", address(ourColorRenderer));
 
-        // zora mint 2
-        bytes memory minterArguments = abi.encode(
-            address(deployer),
-            "test comment"
-        );
-        ZoraCreator1155Impl(zora).mint{value: 0.001554 ether}(
-            IMinter1155(saleStrategy),
-            1,
-            2,
-            minterArguments
-        );
+        ///////debug code/////////////////
 
-        ZoraCreator1155Impl(zora).setApprovalForAll(address(ourColor), true);
-
-        // generate new color
-        IOurColor.ColorUnit[] memory baseColors = new IOurColor.ColorUnit[](1);
-        baseColors[0] = IOurColor.ColorUnit({tokenId: 1, amount: 2});
-        ourColor.createNewColor(baseColors);
-
-        ZoraCreator1155Impl(zora).mint{value: 0.001554 ether}(
-            IMinter1155(saleStrategy),
-            5,
-            2,
-            minterArguments
-        );
+        // bytes memory minterArguments = abi.encode(
+        //     address(deployer),
+        //     "test comment"
+        // );
+        // ZoraCreator1155Impl(zora).mint{value: 0.001554 ether}(
+        //     IMinter1155(saleStrategy),
+        //     1,
+        //     2,
+        //     minterArguments
+        // );
+        // ZoraCreator1155Impl(zora).setApprovalForAll(address(ourColor), true);
+        // IOurColor.ColorUnit[] memory baseColors = new IOurColor.ColorUnit[](1);
+        // baseColors[0] = IOurColor.ColorUnit({tokenId: 2, amount: 2});
+        // ourColor.createNewColor(baseColors);
+        // ZoraCreator1155Impl(zora).mint{value: 0.001554 ether}(
+        //     IMinter1155(saleStrategy),
+        //     5,
+        //     2,
+        //     minterArguments
+        // );
 
         vm.stopBroadcast();
     }

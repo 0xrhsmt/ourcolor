@@ -9,7 +9,7 @@ interface IOurColor {
 
     event ColorCreated(address indexed author, bytes3 color, uint256 tokenId);
 
-    function colors(uint256 index) external view returns (bytes3);
+    function colors(uint256 tokenId) external view returns (bytes3);
 
     function colorToZoraTokenId(bytes3 color) external view returns (uint256);
 

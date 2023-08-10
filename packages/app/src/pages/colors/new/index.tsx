@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { PlusSmallIcon } from '@heroicons/react/24/solid';
+import {} from 'contracts';
 
 import { ZORA_REWARDS_DOCS_URL } from '../../../constants';
 

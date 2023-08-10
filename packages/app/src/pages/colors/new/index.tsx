@@ -32,7 +32,7 @@ const NewPage: React.FC = () => {
     <div>
       <div className="grid grid-cols-2 h-screen">
         <div className="h-full overflow-auto">
-          <div className="p-4">領域1</div>
+          <div className="p-4"></div>
         </div>
 
         <div className="h-full overflow-auto">

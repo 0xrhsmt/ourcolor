@@ -7,13 +7,7 @@ interface IOurColor {
         uint256 amount;
     }
 
-    event TransferSingle(
-        address indexed _operator,
-        address indexed _from,
-        address indexed _to,
-        uint256 _id,
-        uint256 _value
-    );
+    event ColorCreated(address indexed author, bytes3 color, uint256 tokenId);
 
     function colors(uint256 index) external view returns (bytes3);
 

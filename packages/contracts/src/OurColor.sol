@@ -59,26 +59,32 @@ contract OurColor is IOurColor {
     function createNewColor(
         ColorUnit[] memory baseColors
     ) external afterSetup returns (uint256) {
+        address author = msg.sender;
         bytes3 newColor = _mixColors(baseColors);
         if (_isRegisteredColor(newColor)) {
             revert("OurColor: already registered");
         }
 
-        _burnZoraBatch(msg.sender, baseColors);
+        _burnZoraBatch(author, baseColors);
 
-        uint256 tokenId = _registerColor(newColor);
+        uint256 tokenId = _createColor(author, newColor);
 
         return tokenId;
     }
 
     function _seedInitColors() private {
+        address author = address(this);
+
         for (uint256 i = 0; i < initColors.length; i++) {
             bytes3 color = initColors[i];
-            _registerColor(color);
+            _createColor(author, color);
         }
     }
 
-    function _registerColor(bytes3 color) private returns (uint256) {
+    function _createColor(
+        address author,
+        bytes3 color
+    ) private returns (uint256) {
         if (_isRegisteredColor(color)) {
             revert("OurColor: color already registered");
         }
@@ -111,6 +117,8 @@ contract OurColor is IOurColor {
 
         colors[tokenId] = color;
         colorToZoraTokenId[color] = tokenId;
+
+        emit ColorCreated(author, color, tokenId);
 
         return tokenId;
     }

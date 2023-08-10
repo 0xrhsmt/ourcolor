@@ -24,7 +24,7 @@ const wagmiConfig = createConfig({
 });
 
 
-export const NetworkConfigProvider = ({ children }: { children: React.ReactNode }) => (
+export const ChainProvider = ({ children }: { children: React.ReactNode }) => (
     <WagmiConfig config={wagmiConfig}>
       <RainbowKitProvider chains={chains}>
       {children}
@@ -32,4 +32,4 @@ export const NetworkConfigProvider = ({ children }: { children: React.ReactNode 
     </WagmiConfig>
 );
 
-export default NetworkConfigProvider;
+export default ChainProvider;

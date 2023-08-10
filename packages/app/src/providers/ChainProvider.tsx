@@ -5,7 +5,6 @@ import { zoraTestnet } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 import React from 'react';
 
-
 const { chains, publicClient } = configureChains(
   [zoraTestnet],
   [publicProvider()]
@@ -23,13 +22,10 @@ const wagmiConfig = createConfig({
   publicClient,
 });
 
-
 export const ChainProvider = ({ children }: { children: React.ReactNode }) => (
-    <WagmiConfig config={wagmiConfig}>
-      <RainbowKitProvider chains={chains}>
-      {children}
-      </RainbowKitProvider>
-    </WagmiConfig>
+  <WagmiConfig config={wagmiConfig}>
+    <RainbowKitProvider chains={chains}>{children}</RainbowKitProvider>
+  </WagmiConfig>
 );
 
 export default ChainProvider;

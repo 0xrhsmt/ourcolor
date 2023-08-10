@@ -1,5 +1,5 @@
-import { Outlet } from "react-router-dom";
+import { Outlet } from 'react-router-dom';
 
-const RootPage = () => <Outlet />
+const RootPage = () => <Outlet />;
 
 export default RootPage;

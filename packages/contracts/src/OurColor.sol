@@ -56,7 +56,7 @@ contract OurColor is IOurColor {
         _seedInitColors();
     }
 
-    function generateNewColor(
+    function createNewColor(
         ColorUnit[] memory baseColors
     ) external afterSetup returns (uint256) {
         bytes3 newColor = _mixColors(baseColors);

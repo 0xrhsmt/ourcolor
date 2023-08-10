@@ -91,7 +91,7 @@ contract DeployScript is ScriptDeploymentConfig {
         // generate new color
         IOurColor.ColorUnit[] memory baseColors = new IOurColor.ColorUnit[](1);
         baseColors[0] = IOurColor.ColorUnit({tokenId: 1, amount: 2});
-        ourColor.generateNewColor(baseColors);
+        ourColor.createNewColor(baseColors);
 
         ZoraCreator1155Impl(zora).mint{value: 0.001554 ether}(
             IMinter1155(saleStrategy),

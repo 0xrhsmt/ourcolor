@@ -7,7 +7,7 @@ interface IOurColor {
         uint256 amount;
     }
 
-    event ColorCreated(address indexed author, bytes3 color, uint256 tokenId);
+    event ColorCreated(address indexed creator, bytes3 color, uint256 tokenId);
 
     function colors(uint256 tokenId) external view returns (bytes3);
 

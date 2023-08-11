@@ -3,9 +3,7 @@ import { useZoraCreator1155ImplIsApprovedForAll } from '../../../contracts/src';
 import { SupportChains, addresses } from './useColorMetadatas';
 import { useNetwork } from 'wagmi';
 
-export const useColorIsApprovedForAll = (
-  address: `0x${string}` | undefined
-) => {
+export const useGetColorApproval = (address: `0x${string}` | undefined) => {
   const { chain } = useNetwork();
   const ourZora = useMemo(
     () => (chain ? addresses[chain.id as SupportChains].OurZora : undefined),
@@ -21,4 +19,4 @@ export const useColorIsApprovedForAll = (
   };
 };
 
-export default useColorIsApprovedForAll;
+export default useGetColorApproval;

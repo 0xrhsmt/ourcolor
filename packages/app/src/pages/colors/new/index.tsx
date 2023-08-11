@@ -1,13 +1,19 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { PlusSmallIcon } from '@heroicons/react/24/solid';
 
 import { ZORA_REWARDS_DOCS_URL } from '../../../constants';
 import { useColorMetadatas } from '../../../hooks/useColorMetadatas';
-import { useOurColorRendererGenerateSvgImageFromRgb } from '../../../../../contracts/src';
+import {
+  useOurColorCreateNewColor,
+  useOurColorRendererGenerateSvgImageFromRgb,
+  usePrepareOurColorCreateNewColor,
+  useZoraCreator1155ImplSetApprovalForAll,
+} from '../../../../../contracts/src';
 import { useAccount } from 'wagmi';
 import useColorBalances from '../../../hooks/useColorBalance';
-import useColorIsApprovedForAll from '../../../hooks/useColorIsApprovedForAll';
+import useGetColorApproval from '../../../hooks/useGetColorApproval';
+import useSetColorApproval from '../../../hooks/useSetColorApproval';
 
 type FormValues = {
   colors: {
@@ -31,7 +37,6 @@ const useColorForm = () => {
     name: 'colors',
     control,
   });
-  const onSubmit = (data: FormValues) => console.log(data);
 
   return {
     colorFields: fields,
@@ -39,7 +44,7 @@ const useColorForm = () => {
     registerField: register,
     appendColorField: append,
     removeColorField: remove,
-    onSubmit: handleSubmit(onSubmit),
+    handleSubmit,
   };
 };
 
@@ -53,7 +58,7 @@ const NewPage: React.FC = () => {
 
   // TODO: use these hooks
   useColorBalances(address, tokenIds);
-  useColorIsApprovedForAll(address);
+  const { isApproved } = useGetColorApproval(address);
 
   const {
     colorFields,
@@ -61,7 +66,7 @@ const NewPage: React.FC = () => {
     registerField,
     appendColorField,
     removeColorField,
-    onSubmit,
+    handleSubmit,
   } = useColorForm();
 
   const colorInputs = watch('colors');
@@ -92,6 +97,22 @@ const NewPage: React.FC = () => {
     args: [mixedColor.red, mixedColor.blue, mixedColor.green],
   });
 
+  const { setApproval } = useSetColorApproval(true);
+
+  const { config } = usePrepareOurColorCreateNewColor({
+    enabled: isApproved && colorInputs.length > 0,
+    args: [
+      colorInputs.map((c) => ({ tokenId: c.tokenId, amount: c.quantity })),
+    ],
+  });
+  const { write: createNewColor } = useOurColorCreateNewColor(config);
+
+  const onSubmit = useCallback(() => {
+    if (!createNewColor) return;
+
+    createNewColor();
+  }, [createNewColor]);
+
   return (
     <div>
       <div className="grid grid-cols-2 h-screen">
@@ -116,7 +137,7 @@ const NewPage: React.FC = () => {
             <div className="w-10/12 max-w-[400px] py-[150px]">
               <h3 className="text-3xl font-bold mb-8">New Color</h3>
               <div>
-                <form onSubmit={onSubmit}>
+                <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="font-light mb-6">
                     Mix your colors and create a new color.
                     <br />
@@ -203,7 +224,7 @@ const NewPage: React.FC = () => {
                       className="btn btn-ghost"
                       onClick={() =>
                         appendColorField({
-                          tokenId: 0,
+                          tokenId: '2',
                           quantity: 0,
                         })
                       }
@@ -212,13 +233,26 @@ const NewPage: React.FC = () => {
                       Add Color
                     </button>
                   </div>
-                </form>
 
-                <div className="mt-8">
-                  <button className="btn btn-primary btn-lg w-full ">
-                    Mix Colors
-                  </button>
-                </div>
+                  <div className="mt-8">
+                    {isApproved ? (
+                      <button
+                        type="submit"
+                        className="btn btn-primary btn-lg w-full "
+                      >
+                        Mix Colors
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-lg w-full"
+                        onClick={setApproval}
+                      >
+                        Allow burning color tokens
+                      </button>
+                    )}
+                  </div>
+                </form>
               </div>
             </div>
           </div>

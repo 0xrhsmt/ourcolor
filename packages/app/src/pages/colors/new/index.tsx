@@ -8,7 +8,6 @@ import {
   useOurColorCreateNewColor,
   useOurColorRendererGenerateSvgImageFromRgb,
   usePrepareOurColorCreateNewColor,
-  useZoraCreator1155ImplSetApprovalForAll,
 } from '../../../../../contracts/src';
 import { useAccount } from 'wagmi';
 import useColorBalances from '../../../hooks/useColorBalance';
@@ -102,7 +101,10 @@ const NewPage: React.FC = () => {
   const { config } = usePrepareOurColorCreateNewColor({
     enabled: isApproved && colorInputs.length > 0,
     args: [
-      colorInputs.map((c) => ({ tokenId: c.tokenId, amount: c.quantity })),
+      colorInputs.map((c) => ({
+        tokenId: BigInt(c.tokenId),
+        amount: BigInt(c.quantity),
+      })),
     ],
   });
   const { write: createNewColor } = useOurColorCreateNewColor(config);

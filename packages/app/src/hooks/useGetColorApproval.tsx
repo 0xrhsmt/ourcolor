@@ -11,7 +11,7 @@ export const useGetColorApproval = (address: `0x${string}` | undefined) => {
   );
   const { data: isApproved } = useZoraCreator1155ImplIsApprovedForAll({
     enabled: address !== undefined && ourZora !== undefined,
-    args: [address, ourZora],
+    args: [address!, ourZora!],
   });
 
   return {

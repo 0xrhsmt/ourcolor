@@ -15,7 +15,7 @@ export const useSetColorApproval = (approve: boolean) => {
 
   const { config } = usePrepareZoraCreator1155ImplSetApprovalForAll({
     enabled: ourZora !== undefined,
-    args: [ourZora, approve],
+    args: [ourZora!, approve],
   });
   const { write } = useZoraCreator1155ImplSetApprovalForAll(config);
 

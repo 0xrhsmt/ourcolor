@@ -11,7 +11,7 @@ export const useColorBalances = (
   );
   const { data } = useZoraCreator1155ImplBalanceOfBatch({
     enabled: address !== undefined && tokenIds?.length > 0,
-    args: [accounts, tokenIds],
+    args: [accounts, tokenIds.map((t) => BigInt(t))],
   });
 
   return {

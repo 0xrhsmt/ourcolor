@@ -52,7 +52,7 @@ contract DeployScript is ScriptDeploymentConfig {
         IZoraCreator1155Factory factory = IZoraCreator1155Factory(
             factoryAddress
         );
-        address tokenContract = factory.createContract(
+        address zora1155 = factory.createContract(
             "",
             "Our Color",
             ICreatorRoyaltiesControl.RoyaltyConfiguration({
@@ -66,13 +66,13 @@ contract DeployScript is ScriptDeploymentConfig {
 
         // setup OurColor
         address saleStrategy = getDeployment().fixedPriceSaleStrategy;
-        bytes memory initTokenContract = abi.encode(
-            address(tokenContract),
+        bytes memory initZora1155 = abi.encode(
+            address(zora1155),
             address(saleStrategy)
         );
-        ourColor.setup(initTokenContract);
+        ourColor.setup(initZora1155);
 
-        console2.log("ZoraCreator1155Impl", tokenContract);
+        console2.log("ZoraCreator1155Impl", zora1155);
         console2.log("OurColor", address(ourColor));
         console2.log("OurColorRenderer", address(ourColorRenderer));
 
@@ -82,13 +82,13 @@ contract DeployScript is ScriptDeploymentConfig {
             address(deployer),
             "test comment"
         );
-        ZoraCreator1155Impl(tokenContract).mint{value: 0.001554 ether}(
+        ZoraCreator1155Impl(zora1155).mint{value: 0.001554 ether}(
             IMinter1155(saleStrategy),
             2,
             2,
             minterArguments
         );
-        ZoraCreator1155Impl(tokenContract).setApprovalForAll(
+        ZoraCreator1155Impl(zora1155).setApprovalForAll(
             address(ourColor),
             true
         );
@@ -97,7 +97,7 @@ contract DeployScript is ScriptDeploymentConfig {
         );
         colorsToBlend[0] = OurColor.ColorBlend({tokenId: 2, amount: 2});
         ourColor.createNewColor(colorsToBlend);
-        ZoraCreator1155Impl(tokenContract).mint{value: 0.001554 ether}(
+        ZoraCreator1155Impl(zora1155).mint{value: 0.001554 ether}(
             IMinter1155(saleStrategy),
             5,
             2,

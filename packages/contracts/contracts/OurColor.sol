@@ -22,7 +22,7 @@ contract OurColor {
         RGBColor color
     );
 
-    ZoraCreator1155Impl public tokenContract;
+    ZoraCreator1155Impl public zora1155;
     ZoraCreatorFixedPriceSaleStrategy public saleStrategy;
 
     mapping(uint256 => RGBColor) public colors;
@@ -32,19 +32,19 @@ contract OurColor {
         if (data.length == 0) {
             revert();
         }
-        (address _tokenContract, address _saleStrategy) = abi.decode(
+        (address _zora1155, address _saleStrategy) = abi.decode(
             data,
             (address, address)
         );
 
-        tokenContract = ZoraCreator1155Impl(_tokenContract);
+        zora1155 = ZoraCreator1155Impl(_zora1155);
         saleStrategy = ZoraCreatorFixedPriceSaleStrategy(_saleStrategy);
 
         if (
-            !tokenContract.isAdminOrRole(
+            !zora1155.isAdminOrRole(
                 address(this),
                 0,
-                tokenContract.PERMISSION_BIT_MINTER()
+                zora1155.PERMISSION_BIT_MINTER()
             )
         ) {
             revert("OurColor: cannot call ZoraCreator1155#setupNewToken");
@@ -89,8 +89,8 @@ contract OurColor {
         return
             RGBColor(
                 red > 255 ? 255 : uint8(red),
-                blue > 255 ? 255 : uint8(blue),
-                green > 255 ? 255 : uint8(green)
+                green > 255 ? 255 : uint8(green),
+                blue > 255 ? 255 : uint8(blue)
             );
     }
 
@@ -107,7 +107,7 @@ contract OurColor {
             amounts[i] = color.amount;
         }
 
-        tokenContract.burnBatch(registerer, ids, amounts);
+        zora1155.burnBatch(registerer, ids, amounts);
     }
 
     function _registerSeedColors() internal {
@@ -123,7 +123,7 @@ contract OurColor {
         address registerer,
         RGBColor memory color
     ) internal returns (uint256) {
-        uint256 tokenId = _registerColorForTokenContract(registerer, color);
+        uint256 tokenId = _registerColorForZora1155(registerer, color);
 
         colors[tokenId] = color;
         colorToTokenId[_encodeColor(color)] = tokenId;
@@ -133,7 +133,7 @@ contract OurColor {
         return tokenId;
     }
 
-    function _registerColorForTokenContract(
+    function _registerColorForZora1155(
         address registerer,
         RGBColor memory color
     ) internal returns (uint256) {
@@ -141,7 +141,7 @@ contract OurColor {
             revert("OurColor: color already registered");
         }
 
-        uint256 tokenId = tokenContract.setupNewTokenWithCreateReferral(
+        uint256 tokenId = zora1155.setupNewTokenWithCreateReferral(
             "",
             type(uint256).max,
             registerer
@@ -150,12 +150,12 @@ contract OurColor {
             revert("OurColor: failed to setup new token");
         }
 
-        tokenContract.addPermission(
+        zora1155.addPermission(
             tokenId,
             address(saleStrategy),
-            tokenContract.PERMISSION_BIT_MINTER()
+            zora1155.PERMISSION_BIT_MINTER()
         );
-        tokenContract.callSale(
+        zora1155.callSale(
             tokenId,
             saleStrategy,
             abi.encodeWithSelector(

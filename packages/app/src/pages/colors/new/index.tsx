@@ -3,16 +3,15 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { PlusSmallIcon } from '@heroicons/react/24/solid';
 
 import { ZORA_REWARDS_DOCS_URL } from '../../../constants';
-import { useColorMetadatas } from '../../../hooks/useColorMetadatas';
+import { useColorTokenMetadatas } from '../../../hooks/useColorTokenMetadatas';
 import {
   useOurColorCreateNewColor,
-  useOurColorRendererGenerateSvgImageFromRgb,
+  useOurColorRendererGenerateSvgImage,
   usePrepareOurColorCreateNewColor,
 } from '../../../../../contracts/src';
 import { useAccount } from 'wagmi';
-import useColorBalances from '../../../hooks/useColorBalance';
-import useGetColorApproval from '../../../hooks/useGetColorApproval';
-import useSetColorApproval from '../../../hooks/useSetColorApproval';
+import useColorTokenBalances from '../../../hooks/useColorTokenBalances';
+import useApproveZora1155 from '../../../hooks/useApproveZora1155';
 
 type FormValues = {
   colors: {
@@ -49,15 +48,16 @@ const useColorForm = () => {
 
 const NewPage: React.FC = () => {
   const { address } = useAccount();
-  const { colorMetadatas } = useColorMetadatas();
+  const { isApprovedForAll, setApprovalForAll } = useApproveZora1155(address);
+
+  const { colorMetadatas } = useColorTokenMetadatas();
   const tokenIds = useMemo(
     () => colorMetadatas?.map((c) => c.tokenId) ?? [],
     [colorMetadatas]
   );
 
   // TODO: use these hooks
-  useColorBalances(address, tokenIds);
-  const { isApproved } = useGetColorApproval(address);
+  useColorTokenBalances(address, tokenIds);
 
   const {
     colorFields,
@@ -81,25 +81,29 @@ const NewPage: React.FC = () => {
     })
     .filter((c): c is NonNullable<typeof c> => c !== undefined);
 
-  const mixedColor = colorValues.reduce(
+  const blendColor = colorValues.reduce(
     (acc, cur) => {
       acc.red += cur.quantity * cur.color.red;
-      acc.blue += cur.quantity * cur.color.blue;
       acc.green += cur.quantity * cur.color.green;
+      acc.blue += cur.quantity * cur.color.blue;
 
       return acc;
     },
-    { red: 0, blue: 0, green: 0 }
+    { red: 0, green: 0, blue: 0 }
   );
 
-  const { data: currentColorSVG } = useOurColorRendererGenerateSvgImageFromRgb({
-    args: [mixedColor.red, mixedColor.blue, mixedColor.green],
+  const { data: currentColorSVG } = useOurColorRendererGenerateSvgImage({
+    args: [
+      {
+        red: blendColor.red,
+        green: blendColor.green,
+        blue: blendColor.blue,
+      },
+    ],
   });
 
-  const { setApproval } = useSetColorApproval(true);
-
   const { config } = usePrepareOurColorCreateNewColor({
-    enabled: isApproved && colorInputs.length > 0,
+    enabled: isApprovedForAll && colorInputs.length > 0,
     args: [
       colorInputs.map((c) => ({
         tokenId: BigInt(c.tokenId),
@@ -118,13 +122,7 @@ const NewPage: React.FC = () => {
   return (
     <div>
       <div className="grid grid-cols-2 h-screen">
-        <div
-          className="relative h-full overflow-auto"
-          style={{
-            background:
-              'linear-gradient(180deg, rgba(0, 0, 0, 0.6) -1%, rgba(0, 0, 0, 0) 47%, rgba(0, 0, 0, 0.6) 100%)',
-          }}
-        >
+        <div className="relative h-full overflow-auto bg-[#0000000d]">
           <div className="flex justify-center items-center h-full p-16">
             {currentColorSVG && (
               <div className="max-h-[660px]">
@@ -237,7 +235,7 @@ const NewPage: React.FC = () => {
                   </div>
 
                   <div className="mt-8">
-                    {isApproved ? (
+                    {isApprovedForAll ? (
                       <button
                         type="submit"
                         className="btn btn-primary btn-lg w-full "
@@ -248,7 +246,7 @@ const NewPage: React.FC = () => {
                       <button
                         type="button"
                         className="btn btn-primary btn-lg w-full"
-                        onClick={setApproval}
+                        onClick={setApprovalForAll}
                       >
                         Allow burning color tokens
                       </button>

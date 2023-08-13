@@ -4,19 +4,19 @@ import { getAddress, Address } from 'viem';
 import useOurColorAddresses from './useOurColorAddresses';
 import { ColorRegisteredEventAbi } from '../config/abis';
 
-type RGBValue = {
+export type RGBValue = {
   red: number;
   green: number;
   blue: number;
 };
 
-type ColorMetadata = {
+export type ColorMetadata = {
   creatorAddress: Address;
   color: RGBValue;
   tokenId: string;
 };
 
-export const useColorTokenMetadatas = () => {
+export const useZora1155Metadatas = () => {
   const publicClient = usePublicClient();
   const { OurColor: OurColorAddress } = useOurColorAddresses();
 
@@ -57,4 +57,4 @@ export const useColorTokenMetadatas = () => {
   return { colorMetadatas };
 };
 
-export default useColorTokenMetadatas;
+export default useZora1155Metadatas;

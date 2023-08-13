@@ -18,7 +18,7 @@ const HomePage: React.FC = () => (
           Create your own color and share it with your friends.
         </p>
 
-        <Link to="/colors/new">
+        <Link to="/colors">
           <button className="btn btn-primary">Get Started</button>
         </Link>
       </div>

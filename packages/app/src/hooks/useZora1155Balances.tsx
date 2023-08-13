@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useZoraCreator1155ImplBalanceOfBatch } from 'contracts';
 
-export const useColorTokenBalances = (
+export const useZora1155Balances = (
   address: `0x${string}` | undefined,
   tokenIds: string[]
 ) => {
@@ -19,4 +19,4 @@ export const useColorTokenBalances = (
   };
 };
 
-export default useColorTokenBalances;
+export default useZora1155Balances;

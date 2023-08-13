@@ -1,16 +1,17 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { PlusSmallIcon } from '@heroicons/react/24/solid';
+import { waitForTransaction } from '@wagmi/core';
+import { useNavigate } from 'react-router-dom';
 
 import { ZORA_REWARDS_DOCS_URL } from '../../../constants';
-import { useColorTokenMetadatas } from '../../../hooks/useColorTokenMetadatas';
+import { useZora1155Metadatas } from '../../../hooks/useZora1155Metadatas';
 import {
   useOurColorCreateNewColor,
   useOurColorRendererGenerateSvgImage,
   usePrepareOurColorCreateNewColor,
-} from '../../../../../contracts/src';
+} from 'contracts';
 import { useAccount } from 'wagmi';
-import useColorTokenBalances from '../../../hooks/useColorTokenBalances';
 import useApproveZora1155 from '../../../hooks/useApproveZora1155';
 
 type FormValues = {
@@ -47,17 +48,12 @@ const useColorForm = () => {
 };
 
 const NewPage: React.FC = () => {
+  const navigate = useNavigate();
+
   const { address } = useAccount();
   const { isApprovedForAll, setApprovalForAll } = useApproveZora1155(address);
 
-  const { colorMetadatas } = useColorTokenMetadatas();
-  const tokenIds = useMemo(
-    () => colorMetadatas?.map((c) => c.tokenId) ?? [],
-    [colorMetadatas]
-  );
-
-  // TODO: use these hooks
-  useColorTokenBalances(address, tokenIds);
+  const { colorMetadatas } = useZora1155Metadatas();
 
   const {
     colorFields,
@@ -111,13 +107,21 @@ const NewPage: React.FC = () => {
       })),
     ],
   });
-  const { write: createNewColor } = useOurColorCreateNewColor(config);
+  const { writeAsync: createNewColor } = useOurColorCreateNewColor(config);
 
-  const onSubmit = useCallback(() => {
+  const onSubmit = useCallback(async () => {
     if (!createNewColor) return;
 
-    createNewColor();
-  }, [createNewColor]);
+    const tx = await createNewColor();
+
+    const result = await waitForTransaction(tx);
+    if (result.status === 'success') {
+      navigate('/colors');
+    } else {
+      console.error(result);
+      alert('Something went wrong');
+    }
+  }, [createNewColor, navigate]);
 
   return (
     <div>

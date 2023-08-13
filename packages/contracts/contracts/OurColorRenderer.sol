@@ -5,13 +5,13 @@ import {IERC165} from "@openzeppelin/contracts/interfaces/IERC165.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 import {IRenderer1155} from "@zoralabs/zora-1155-contracts/interfaces/IRenderer1155.sol";
 
-import {IOurColor} from "./interfaces/IOurColor.sol";
-import {ToHex} from "./utils/ToHex.sol";
+import {OurColor} from "./OurColor.sol";
+import {Uint8ToHexLib} from "./utils/Uint8ToHexLib.sol";
 
 contract OurColorRenderer is IRenderer1155 {
-    using ToHex for bytes3;
+    using Uint8ToHexLib for uint8;
 
-    IOurColor public ourColor;
+    OurColor public ourColor;
 
     string public contractName;
     string public contractDescription;
@@ -58,7 +58,7 @@ contract OurColorRenderer is IRenderer1155 {
             string memory _contractDescription
         ) = abi.decode(data, (address, string, string));
 
-        ourColor = IOurColor(_ourColor);
+        ourColor = OurColor(_ourColor);
         contractName = _contractName;
         contractDescription = _contractDescription;
     }
@@ -66,24 +66,17 @@ contract OurColorRenderer is IRenderer1155 {
     function generateSVGImageFromTokenId(
         uint256 tokenId
     ) public view returns (string memory svg) {
-        bytes3 color = ourColor.colors(tokenId);
-
-        return generateSVGImage(color);
-    }
-
-    function generateSVGImageFromRGB(
-        uint8 r,
-        uint8 g,
-        uint8 b
-    ) public pure returns (string memory svg) {
-        bytes3 color = bytes3(abi.encodePacked(r, g, b));
+        (uint8 red, uint8 green, uint8 blue) = ourColor.colors(tokenId);
+        OurColor.RGBColor memory color = OurColor.RGBColor(red, green, blue);
 
         return generateSVGImage(color);
     }
 
     function generateSVGImage(
-        bytes3 color
+        OurColor.RGBColor memory color
     ) public pure returns (string memory svg) {
+        string memory hexColor = _rgbColorToHexColor(color);
+
         // prettier-ignore
         return
             Base64.encode(
@@ -95,7 +88,7 @@ contract OurColorRenderer is IRenderer1155 {
                                 '<radialGradient id="paint0_radial_1467_0" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(452.155 193.511) rotate(138.09) scale(529.332 529.332)">',
                                     '<stop offset="0.0267" stop-color="#FFFFFF" />',
                                     '<stop offset="0.35" stop-color="#',
-                                        color.bytes3ToHexString(),
+                                        hexColor,
                                     '" />',
                                 '</radialGradient>',
                             '</defs>',
@@ -109,5 +102,18 @@ contract OurColorRenderer is IRenderer1155 {
         bytes4 interfaceID
     ) external pure returns (bool) {
         return interfaceID == type(IRenderer1155).interfaceId;
+    }
+
+    function _rgbColorToHexColor(
+        OurColor.RGBColor memory color
+    ) internal pure returns (string memory hexString) {
+        return
+            string(
+                abi.encodePacked(
+                    color.red.toHexStr(),
+                    color.green.toHexStr(),
+                    color.blue.toHexStr()
+                )
+            );
     }
 }

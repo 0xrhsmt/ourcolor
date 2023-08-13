@@ -10,7 +10,6 @@ import {IMinter1155} from "@zoralabs/zora-1155-contracts/interfaces/IMinter1155.
 import {ZoraCreator1155Impl} from "@zoralabs/zora-1155-contracts/nft/ZoraCreator1155Impl.sol";
 
 import {OurColor} from "../contracts/OurColor.sol";
-import {IOurColor} from "../contracts/interfaces/IOurColor.sol";
 import {OurColorRenderer} from "../contracts/OurColorRenderer.sol";
 
 contract DeployScript is ScriptDeploymentConfig {
@@ -19,11 +18,6 @@ contract DeployScript is ScriptDeploymentConfig {
     function run() public {
         uint256 deployerKey = vm.envUint("DEPLOYER_KEY");
         address deployer = vm.addr(deployerKey);
-        address factoryAddress = getDeployment().factoryProxy;
-        address saleStrategy = getDeployment().fixedPriceSaleStrategy;
-        IZoraCreator1155Factory factory = IZoraCreator1155Factory(
-            factoryAddress
-        );
 
         vm.startBroadcast(deployerKey);
 
@@ -32,12 +26,13 @@ contract DeployScript is ScriptDeploymentConfig {
 
         // deploy OurColorRenderer and setup
         OurColorRenderer ourColorRenderer = new OurColorRenderer();
-        bytes memory initRendererData = abi.encode(
+
+        bytes memory initRenderer = abi.encode(
             address(ourColor),
             "test name",
             "test description"
         );
-        ourColorRenderer.setup(initRendererData);
+        ourColorRenderer.setup(initRenderer);
 
         // deploy ZoraCreator1155
         bytes[] memory setupActions = new bytes[](2);
@@ -50,10 +45,14 @@ contract DeployScript is ScriptDeploymentConfig {
             ZoraCreator1155Impl.addPermission.selector,
             0,
             address(ourColor),
-            2
+            2 // PERMISSION_BIT_ADMIN
         );
 
-        address zora = factory.createContract(
+        address factoryAddress = getDeployment().factoryProxy;
+        IZoraCreator1155Factory factory = IZoraCreator1155Factory(
+            factoryAddress
+        );
+        address tokenContract = factory.createContract(
             "",
             "Our Color",
             ICreatorRoyaltiesControl.RoyaltyConfiguration({
@@ -66,38 +65,44 @@ contract DeployScript is ScriptDeploymentConfig {
         );
 
         // setup OurColor
-        bytes memory initOurColorData = abi.encode(
-            address(zora),
+        address saleStrategy = getDeployment().fixedPriceSaleStrategy;
+        bytes memory initTokenContract = abi.encode(
+            address(tokenContract),
             address(saleStrategy)
         );
-        ourColor.setup(initOurColorData);
+        ourColor.setup(initTokenContract);
 
-        console2.log("ZoraCreator1155Impl", zora);
+        console2.log("ZoraCreator1155Impl", tokenContract);
         console2.log("OurColor", address(ourColor));
         console2.log("OurColorRenderer", address(ourColorRenderer));
 
         ///////debug code/////////////////
 
-        // bytes memory minterArguments = abi.encode(
-        //     address(deployer),
-        //     "test comment"
-        // );
-        // ZoraCreator1155Impl(zora).mint{value: 0.001554 ether}(
-        //     IMinter1155(saleStrategy),
-        //     1,
-        //     2,
-        //     minterArguments
-        // );
-        // ZoraCreator1155Impl(zora).setApprovalForAll(address(ourColor), true);
-        // IOurColor.ColorUnit[] memory baseColors = new IOurColor.ColorUnit[](1);
-        // baseColors[0] = IOurColor.ColorUnit({tokenId: 2, amount: 2});
-        // ourColor.createNewColor(baseColors);
-        // ZoraCreator1155Impl(zora).mint{value: 0.001554 ether}(
-        //     IMinter1155(saleStrategy),
-        //     5,
-        //     2,
-        //     minterArguments
-        // );
+        bytes memory minterArguments = abi.encode(
+            address(deployer),
+            "test comment"
+        );
+        ZoraCreator1155Impl(tokenContract).mint{value: 0.001554 ether}(
+            IMinter1155(saleStrategy),
+            2,
+            2,
+            minterArguments
+        );
+        ZoraCreator1155Impl(tokenContract).setApprovalForAll(
+            address(ourColor),
+            true
+        );
+        OurColor.ColorBlend[] memory colorsToBlend = new OurColor.ColorBlend[](
+            1
+        );
+        colorsToBlend[0] = OurColor.ColorBlend({tokenId: 2, amount: 2});
+        ourColor.createNewColor(colorsToBlend);
+        ZoraCreator1155Impl(tokenContract).mint{value: 0.001554 ether}(
+            IMinter1155(saleStrategy),
+            5,
+            2,
+            minterArguments
+        );
 
         vm.stopBroadcast();
     }

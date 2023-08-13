@@ -12,13 +12,13 @@ export default defineConfig({
       },
       deployments: {
         ZoraCreator1155Impl: {
-          999: "0x7438724e1e144847f5cFb6A82eFbCB0c9A3Be7Ce",
+          999: "0x5de01F75deCF8364dBca7B7d75bE116389638716",
         },
         OurColor: {
-          999: "0x7e8091557a54287CFFBEcC0B0D48f16B83E12F9b",
+          999: "0x2b7064E9674d767Cd7eFd4aEB150b493F03a4621",
         },
         OurColorRenderer: {
-          999: "0xceEc4C1cF19696226145b14e7768abC32e1031d0",
+          999: "0x8E1e088eD7049B2Ff43AD89D6d443fD066826315",
         },
       },
       include: [

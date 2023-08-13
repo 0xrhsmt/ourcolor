@@ -1,109 +1,161 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 
-import {IOurColor} from "./interfaces/IOurColor.sol";
-import {IZoraCreator1155} from "@zoralabs/zora-1155-contracts/interfaces/IZoraCreator1155.sol";
-import {IZoraCreator1155Factory} from "@zoralabs/zora-1155-contracts/interfaces/IZoraCreator1155Factory.sol";
+import {ZoraCreator1155Impl} from "@zoralabs/zora-1155-contracts/nft/ZoraCreator1155Impl.sol";
 import {ZoraCreatorFixedPriceSaleStrategy} from "@zoralabs/zora-1155-contracts/minters/fixed-price/ZoraCreatorFixedPriceSaleStrategy.sol";
-import {ICreatorRoyaltiesControl} from "@zoralabs/zora-1155-contracts/interfaces/ICreatorRoyaltiesControl.sol";
-import {IMinter1155} from "@zoralabs/zora-1155-contracts/interfaces/IMinter1155.sol";
 
-contract OurColor is IOurColor {
-    bytes3[4] public initColors;
+contract OurColor {
+    struct RGBColor {
+        uint8 red;
+        uint8 green;
+        uint8 blue;
+    }
 
-    IZoraCreator1155 public zora;
+    struct ColorBlend {
+        uint256 tokenId;
+        uint256 amount;
+    }
+
+    event ColorRegistered(
+        address indexed registerer,
+        uint256 tokenId,
+        RGBColor color
+    );
+
+    ZoraCreator1155Impl public tokenContract;
     ZoraCreatorFixedPriceSaleStrategy public saleStrategy;
 
-    mapping(uint256 => bytes3) public colors;
-    mapping(bytes3 => uint256) public colorToZoraTokenId;
+    mapping(uint256 => RGBColor) public colors;
+    mapping(bytes3 => uint256) public colorToTokenId;
 
-    modifier beforeSetup() {
-        require(address(zora) == address(0), "OurColor: already setup");
-        _;
-    }
-    modifier afterSetup() {
-        require(address(zora) != address(0), "OurColor: not setup");
-        _;
-    }
-
-    constructor() {
-        initColors = [
-            bytes3(abi.encodePacked(uint8(0), uint8(0), uint8(0))),
-            bytes3(abi.encodePacked(uint8(1), uint8(0), uint8(0))),
-            bytes3(abi.encodePacked(uint8(0), uint8(1), uint8(0))),
-            bytes3(abi.encodePacked(uint8(0), uint8(0), uint8(1)))
-        ];
-    }
-
-    function setup(bytes memory data) external beforeSetup {
+    function setup(bytes memory data) external {
         if (data.length == 0) {
             revert();
         }
-        (address _zora, address _saleStrategy) = abi.decode(
+        (address _tokenContract, address _saleStrategy) = abi.decode(
             data,
             (address, address)
         );
 
-        zora = IZoraCreator1155(_zora);
+        tokenContract = ZoraCreator1155Impl(_tokenContract);
         saleStrategy = ZoraCreatorFixedPriceSaleStrategy(_saleStrategy);
 
         if (
-            !zora.isAdminOrRole(address(this), 0, zora.PERMISSION_BIT_MINTER())
+            !tokenContract.isAdminOrRole(
+                address(this),
+                0,
+                tokenContract.PERMISSION_BIT_MINTER()
+            )
         ) {
             revert("OurColor: cannot call ZoraCreator1155#setupNewToken");
         }
 
-        _seedInitColors();
+        _registerSeedColors();
     }
 
     function createNewColor(
-        ColorUnit[] memory baseColors
-    ) external afterSetup returns (uint256) {
-        address creator = msg.sender;
-        bytes3 newColor = _mixColors(baseColors);
+        ColorBlend[] memory colorsToBlend
+    ) external returns (uint256) {
+        address registerer = msg.sender;
+
+        RGBColor memory newColor = _blendColors(colorsToBlend);
         if (_isRegisteredColor(newColor)) {
             revert("OurColor: already registered");
         }
 
-        _burnZoraBatch(creator, baseColors);
+        _burnTokensToBlend(registerer, colorsToBlend);
 
-        uint256 tokenId = _createColor(creator, newColor);
+        uint256 tokenId = _registerColor(registerer, newColor);
 
         return tokenId;
     }
 
-    function _seedInitColors() private {
-        address creator = address(this);
+    function _blendColors(
+        ColorBlend[] memory colorsToBlend
+    ) internal view returns (RGBColor memory) {
+        uint256 red = 0;
+        uint256 green = 0;
+        uint256 blue = 0;
 
-        for (uint256 i = 0; i < initColors.length; i++) {
-            bytes3 color = initColors[i];
-            _createColor(creator, color);
+        for (uint256 i = 0; i < colorsToBlend.length; i++) {
+            ColorBlend memory colorBlend = colorsToBlend[i];
+            RGBColor memory rgbColor = colors[colorBlend.tokenId];
+
+            red += rgbColor.red * colorBlend.amount;
+            green += rgbColor.green * colorBlend.amount;
+            blue += rgbColor.blue * colorBlend.amount;
         }
+
+        return
+            RGBColor(
+                red > 255 ? 255 : uint8(red),
+                blue > 255 ? 255 : uint8(blue),
+                green > 255 ? 255 : uint8(green)
+            );
     }
 
-    function _createColor(
-        address creator,
-        bytes3 color
-    ) private returns (uint256) {
+    function _burnTokensToBlend(
+        address registerer,
+        ColorBlend[] memory colorsToBlend
+    ) private {
+        uint256[] memory ids = new uint256[](colorsToBlend.length);
+        uint256[] memory amounts = new uint256[](colorsToBlend.length);
+
+        for (uint256 i = 0; i < colorsToBlend.length; i++) {
+            ColorBlend memory color = colorsToBlend[i];
+            ids[i] = color.tokenId;
+            amounts[i] = color.amount;
+        }
+
+        tokenContract.burnBatch(registerer, ids, amounts);
+    }
+
+    function _registerSeedColors() internal {
+        address registerer = msg.sender;
+
+        _registerColor(registerer, RGBColor(0, 0, 0)); // black
+        _registerColor(registerer, RGBColor(1, 0, 0)); // red origin
+        _registerColor(registerer, RGBColor(0, 1, 0)); // green origin
+        _registerColor(registerer, RGBColor(0, 0, 1)); // blue origin
+    }
+
+    function _registerColor(
+        address registerer,
+        RGBColor memory color
+    ) internal returns (uint256) {
+        uint256 tokenId = _registerColorForTokenContract(registerer, color);
+
+        colors[tokenId] = color;
+        colorToTokenId[_encodeColor(color)] = tokenId;
+
+        emit ColorRegistered(registerer, tokenId, color);
+
+        return tokenId;
+    }
+
+    function _registerColorForTokenContract(
+        address registerer,
+        RGBColor memory color
+    ) internal returns (uint256) {
         if (_isRegisteredColor(color)) {
             revert("OurColor: color already registered");
         }
 
-        uint256 tokenId = zora.setupNewTokenWithCreateReferral(
+        uint256 tokenId = tokenContract.setupNewTokenWithCreateReferral(
             "",
             type(uint256).max,
-            creator
+            registerer
         );
         if (tokenId == 0) {
             revert("OurColor: failed to setup new token");
         }
 
-        zora.addPermission(
+        tokenContract.addPermission(
             tokenId,
             address(saleStrategy),
-            zora.PERMISSION_BIT_MINTER()
+            tokenContract.PERMISSION_BIT_MINTER()
         );
-        zora.callSale(
+        tokenContract.callSale(
             tokenId,
             saleStrategy,
             abi.encodeWithSelector(
@@ -119,46 +171,18 @@ contract OurColor is IOurColor {
             )
         );
 
-        colors[tokenId] = color;
-        colorToZoraTokenId[color] = tokenId;
-
-        emit ColorCreated(creator, color, tokenId);
-
         return tokenId;
     }
 
-    function _isRegisteredColor(bytes3 color) private view returns (bool) {
-        return colorToZoraTokenId[color] != 0;
+    function _isRegisteredColor(
+        RGBColor memory color
+    ) internal view returns (bool) {
+        return colorToTokenId[_encodeColor(color)] != 0;
     }
 
-    function _mixColors(
-        ColorUnit[] memory baseColors
-    ) private view returns (bytes3) {
-        uint8 r = 0;
-        uint8 g = 0;
-        uint8 b = 0;
-
-        for (uint256 i = 0; i < baseColors.length; i++) {
-            ColorUnit memory baseColor = baseColors[i];
-            bytes3 color = colors[baseColor.tokenId];
-            r += uint8(color[0]) * uint8(baseColor.amount);
-            g += uint8(color[1]) * uint8(baseColor.amount);
-            b += uint8(color[2]) * uint8(baseColor.amount);
-        }
-
-        return bytes3(abi.encodePacked(r, g, b));
-    }
-
-    function _burnZoraBatch(address from, ColorUnit[] memory targets) private {
-        uint256[] memory ids = new uint256[](targets.length);
-        uint256[] memory amounts = new uint256[](targets.length);
-
-        for (uint256 i = 0; i < targets.length; i++) {
-            ColorUnit memory target = targets[i];
-            ids[i] = target.tokenId;
-            amounts[i] = target.amount;
-        }
-
-        zora.burnBatch(from, ids, amounts);
+    function _encodeColor(
+        RGBColor memory color
+    ) internal pure returns (bytes3) {
+        return bytes3(abi.encodePacked(color.red, color.green, color.blue));
     }
 }

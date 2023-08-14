@@ -78,31 +78,31 @@ contract DeployScript is ScriptDeploymentConfig {
 
         ///////debug code/////////////////
 
-        bytes memory minterArguments = abi.encode(
-            address(deployer),
-            "test comment"
-        );
-        ZoraCreator1155Impl(zora1155).mint{value: 0.001554 ether}(
-            IMinter1155(saleStrategy),
-            2,
-            2,
-            minterArguments
-        );
-        ZoraCreator1155Impl(zora1155).setApprovalForAll(
-            address(ourColor),
-            true
-        );
-        OurColor.ColorBlend[] memory colorsToBlend = new OurColor.ColorBlend[](
-            1
-        );
-        colorsToBlend[0] = OurColor.ColorBlend({tokenId: 2, amount: 2});
-        ourColor.createNewColor(colorsToBlend);
-        ZoraCreator1155Impl(zora1155).mint{value: 0.001554 ether}(
-            IMinter1155(saleStrategy),
-            5,
-            2,
-            minterArguments
-        );
+        // bytes memory minterArguments = abi.encode(
+        //     address(deployer),
+        //     "test comment"
+        // );
+        // ZoraCreator1155Impl(zora1155).mint{value: 0.001554 ether}(
+        //     IMinter1155(saleStrategy),
+        //     2,
+        //     2,
+        //     minterArguments
+        // );
+        // ZoraCreator1155Impl(zora1155).setApprovalForAll(
+        //     address(ourColor),
+        //     true
+        // );
+        // OurColor.ColorBlend[] memory colorsToBlend = new OurColor.ColorBlend[](
+        //     1
+        // );
+        // colorsToBlend[0] = OurColor.ColorBlend({tokenId: 2, amount: 2});
+        // ourColor.createNewColor(colorsToBlend);
+        // ZoraCreator1155Impl(zora1155).mint{value: 0.001554 ether}(
+        //     IMinter1155(saleStrategy),
+        //     5,
+        //     2,
+        //     minterArguments
+        // );
 
         vm.stopBroadcast();
     }

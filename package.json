@@ -8,5 +8,11 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "engines": {
+    "node": "18.x",
+    "pnpm": "8.x",
+    "npm": "please use pnpm",
+    "yarn": "please use pnpm"
+  }
 }

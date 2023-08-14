@@ -6,16 +6,16 @@ import {
 import useOurColorAddresses from './useOurColorAddresses';
 
 export const useApproveZora1155 = (user: `0x${string}` | undefined) => {
-  const { Zora1155Contract } = useOurColorAddresses();
+  const { OurColor } = useOurColorAddresses();
 
   const { data: isApprovedForAll } = useZoraCreator1155ImplIsApprovedForAll({
-    enabled: user !== undefined && Zora1155Contract !== undefined,
-    args: [user!, Zora1155Contract!],
+    enabled: user !== undefined && OurColor !== undefined,
+    args: [user!, OurColor!],
   });
 
   const { config } = usePrepareZoraCreator1155ImplSetApprovalForAll({
-    enabled: Zora1155Contract !== undefined,
-    args: [Zora1155Contract!, true],
+    enabled: OurColor !== undefined,
+    args: [OurColor!, true],
   });
   const { write: setApprovalForAll } =
     useZoraCreator1155ImplSetApprovalForAll(config);

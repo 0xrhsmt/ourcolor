@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid';
 import { useAccount, useNetwork } from 'wagmi';
-import { zoraTestnet } from 'wagmi/chains';
+import { zoraTestnet, optimismGoerli, baseGoerli } from 'wagmi/chains';
 
 import useZora1155Metadatas, {
   ColorMetadata,
@@ -13,6 +13,8 @@ import { Link } from 'react-router-dom';
 
 const networkPrefix = {
   [zoraTestnet.id]: 'zgor',
+  [optimismGoerli.id]: 'ogor',
+  [baseGoerli.id]: 'basegor',
 };
 
 const ColorCard: React.FC<{

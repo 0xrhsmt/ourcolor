@@ -1,5 +1,5 @@
 import { Address } from 'viem';
-import { zoraTestnet } from 'wagmi/chains';
+import { zoraTestnet, optimismGoerli, baseGoerli } from 'wagmi/chains';
 import { SupportChainIdType } from './supportChains';
 import {
   ourColorAddress,
@@ -18,6 +18,16 @@ export const Addresses = {
     OurColor: ourColorAddress[zoraTestnet.id],
     OurColorRenderer: ourColorRendererAddress[zoraTestnet.id],
     Zora1155Contract: zoraCreator1155ImplAddress[zoraTestnet.id],
+  },
+  [optimismGoerli.id]: {
+    OurColor: ourColorAddress[optimismGoerli.id],
+    OurColorRenderer: ourColorRendererAddress[optimismGoerli.id],
+    Zora1155Contract: zoraCreator1155ImplAddress[optimismGoerli.id],
+  },
+  [baseGoerli.id]: {
+    OurColor: ourColorAddress[baseGoerli.id],
+    OurColorRenderer: ourColorRendererAddress[baseGoerli.id],
+    Zora1155Contract: zoraCreator1155ImplAddress[baseGoerli.id],
   },
 } as {
   [chainId in SupportChainIdType]: AddressConfig;

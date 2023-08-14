@@ -1,12 +1,12 @@
 import '@rainbow-me/rainbowkit/styles.css';
 import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { configureChains, createConfig, WagmiConfig } from 'wagmi';
-import { zoraTestnet } from 'wagmi/chains';
+import { zoraTestnet, optimismGoerli, baseGoerli } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 import React from 'react';
 
 const { chains, publicClient } = configureChains(
-  [zoraTestnet],
+  [zoraTestnet, optimismGoerli, baseGoerli],
   [publicProvider()]
 );
 

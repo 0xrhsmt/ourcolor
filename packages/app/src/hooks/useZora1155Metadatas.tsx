@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { usePublicClient } from 'wagmi';
+import { useNetwork, usePublicClient } from 'wagmi';
 import { getAddress, Address } from 'viem';
 import useOurColorAddresses from './useOurColorAddresses';
 import { ColorRegisteredEventAbi } from '../config/abis';
+import { baseGoerli } from 'wagmi/chains';
 
 export type RGBValue = {
   red: number;
@@ -17,6 +18,7 @@ export type ColorMetadata = {
 };
 
 export const useZora1155Metadatas = () => {
+  const { chain } = useNetwork();
   const publicClient = usePublicClient();
   const { OurColor: OurColorAddress } = useOurColorAddresses();
 
@@ -29,7 +31,7 @@ export const useZora1155Metadatas = () => {
     }
 
     const logs = await publicClient.getLogs({
-      fromBlock: BigInt(0),
+      fromBlock: chain.id === baseGoerli.id ? BigInt(8401210) : BigInt(0),
       toBlock: 'latest',
       address: OurColorAddress,
       event: ColorRegisteredEventAbi,

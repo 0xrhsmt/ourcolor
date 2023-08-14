@@ -13,6 +13,14 @@ However, you can also receive a reward.
 If someone else mints the color you created, you receive a portion of the rewards.
 If you create popular colors early on, you might be able to be rich.
 
+## Live Demo
+
+https://ourcolor-app.vercel.app/
+
+## Demo Video
+
+https://ethglobal.com/showcase/ourcolor-7ecwm
+
 ## Game Rules
 
 ### Color Token

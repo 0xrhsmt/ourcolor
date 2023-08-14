@@ -1,6 +1,6 @@
 # Ourcolor
 
-This project is a tool that allows you to create fully on-chain Open Edition NFTs of colors.
+This project is a tool that allows you to create fully on-chain Zora Open Edition NFTs of colors.
 Anyone can easily create NFTs of their favorite colors.
 
 However, there are some steps involved and a gaming element to obtaining your preferred color.
@@ -46,9 +46,9 @@ For details on the reward system, please refer to [Zora Protocol Rewards](https:
 
 ### Prerequisites
 
-* node
-* pnpm
-* foundry
+* [node (>= 18.x.x)](https://nodejs.org/en)
+* [pnpm (>= 8.x.x)](https://pnpm.io/)
+* [foundry](https://book.getfoundry.sh/)
 
 ### Local Development
 
@@ -68,6 +68,6 @@ $pnpm exec wagmi generate
 
 ## Acknowledges
 
-* Zora
-* Optimism
-* Base
+* [Zora](zora.co)
+* [Optimism](https://www.optimism.io/)
+* [Base](https://base.org/)

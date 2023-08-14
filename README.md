@@ -1,5 +1,7 @@
 # Ourcolor
 
+<img width="450" alt="screenshot" src="https://raw.githubusercontent.com/0xrhsmt/ourcolor/main/docs/assets/ourclor.png">
+
 This project is a tool that allows you to create fully on-chain Zora Open Edition NFTs of colors.
 Anyone can easily create NFTs of their favorite colors.
 

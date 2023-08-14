@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 importers:
 
   .: {}
@@ -12,6 +16,9 @@ importers:
       '@rainbow-me/rainbowkit':
         specifier: ^1.0.8
         version: 1.0.8(@types/react@18.2.20)(react-dom@18.2.0)(react@18.2.0)(viem@1.5.4)(wagmi@1.3.10)
+      '@vercel/analytics':
+        specifier: ^1.0.2
+        version: 1.0.2
       '@wagmi/core':
         specifier: ^1.3.9
         version: 1.3.9(@types/react@18.2.20)(react@18.2.0)(typescript@5.1.6)(viem@1.5.4)
@@ -1280,6 +1287,10 @@ packages:
       '@vanilla-extract/css': ^1.0.0
     dependencies:
       '@vanilla-extract/css': 1.9.1
+    dev: false
+
+  /@vercel/analytics@1.0.2:
+    resolution: {integrity: sha512-BZFxVrv24VbNNl5xMxqUojQIegEeXMI6rX3rg1uVLYUEXsuKNBSAEQf4BWEcjQDp/8aYJOj6m8V4PUA3x/cxgg==}
     dev: false
 
   /@vitejs/plugin-react@4.0.4(vite@4.4.9):
@@ -5436,7 +5447,3 @@ packages:
       '@types/react': 18.2.20
       react: 18.2.0
       use-sync-external-store: 1.2.0(react@18.2.0)
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false

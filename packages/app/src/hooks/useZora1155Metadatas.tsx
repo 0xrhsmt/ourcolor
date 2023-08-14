@@ -50,7 +50,7 @@ export const useZora1155Metadatas = () => {
     });
 
     setColorMetadatas(newColors);
-  }, [OurColorAddress, publicClient]);
+  }, [OurColorAddress, chain?.id, publicClient]);
 
   useEffect(() => {
     fetchColors();

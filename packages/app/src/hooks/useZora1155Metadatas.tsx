@@ -31,7 +31,7 @@ export const useZora1155Metadatas = () => {
     }
 
     const logs = await publicClient.getLogs({
-      fromBlock: chain.id === baseGoerli.id ? BigInt(8401210) : BigInt(0),
+      fromBlock: chain?.id === baseGoerli.id ? BigInt(8401210) : BigInt(0),
       toBlock: 'latest',
       address: OurColorAddress,
       event: ColorRegisteredEventAbi,
